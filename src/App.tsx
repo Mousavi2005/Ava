@@ -1,8 +1,8 @@
 import './App.css'
 import DropDown from './components/dropdown/dropdown'
 import Sidebar from './components/sidebar/sidebar'
-import HeaderText from './components/texts/headerTexts'
-import Uploading from './components/uploading/uploading'
+import HeaderText from './components/texts/header/headerTexts'
+import Uploading from './components/uploading/uploadLayout'
 
 function App() {
 
