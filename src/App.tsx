@@ -1,21 +1,15 @@
 import './App.css'
-import DropDown from './components/dropdown/dropdown'
-import Sidebar from './components/sidebar/sidebar'
-import HeaderText from './components/texts/header/headerTexts'
-import Uploading from './components/uploading/uploadLayout'
+import FirstPage from './components/firstPage/page'
+import ArchivePage from './components/archivePage/page'
 
 function App() {
 
     return (
         <div className=' w-screen h-screen relative flex justify-end'>
-            <DropDown></DropDown>
 
-            <div className='w-full flex flex-col items-center'>
-                <HeaderText></HeaderText>
-                <Uploading></Uploading>
-            </div>
+            <ArchivePage></ArchivePage>
+            {/* <FirstPage></FirstPage> */}
 
-            <Sidebar></Sidebar>
 
 
         </div>
