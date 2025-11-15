@@ -1,14 +1,11 @@
 import ToggleHeader from "../toggleHeader/page"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../store/store"
-import SectionOne from "./SectionOne"
-import SectionTwo from "./section2/sectionTwo"
 import SectionTwoWithContent from "./section2/section2WithContent"
-import SectionThree from "./sectionThree"
 
 function Uploading() {
     const activeSection = useSelector((state: RootState) => state.toggle.active)
-    console.log(activeSection);
+    // console.log(activeSection);
 
     return (
         <div className="w-[653px] h-[477px]">
