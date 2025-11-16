@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import axios from "axios";
 import React from "react";
 import Expanded from "../expanded";
+import Pagination from "../pagination";
 
 // icons
 import archiveUpload from "../../assets/icons/archive/rightIcons/archiveUploadIcon.svg";
@@ -120,6 +121,14 @@ export default function ArchiveContent() {
         }).format(date).replaceAll("/", "-");
     }
 
+    function formatTime(t: string) {
+        // input: 0:00:0.510
+        const parts = t.split(":");
+        const minutes = parts[1];
+        const seconds = parts[2]
+        return `${minutes}:${seconds}`;
+    }
+
     async function listRequests() {
         const token = import.meta.env.VITE_API_TOKEN;
         try {
@@ -138,12 +147,20 @@ export default function ArchiveContent() {
                     ...d,
                     audioType: getAudioType(d.filename),
                     processed: isoToJalali(d.processed),
+                    segments: d.segments?.map(s => ({
+                        ...s,
+                        start: formatTime(s.start),
+                        end: formatTime(s.end)
+                    }))
                 }));
                 setAudios(updated);
             }
         }
         load();
     }, []);
+
+    console.log(audios);
+
 
     return (
         <div className="w-[1100px]">
@@ -204,30 +221,8 @@ export default function ArchiveContent() {
                 </tbody>
             </table>
 
-            <div className="w-full flex items-center justify-center gap-4 mt-4 text-sm">
+            <Pagination table={table}></Pagination>
 
-                <button
-                    className="px-3 py-1 border rounded"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    بعدی
-                </button>
-
-                <span>
-                    صفحه {table.getState().pagination.pageIndex + 1} از {table.getPageCount()}
-                </span>
-
-
-                <button
-                    className="px-3 py-1 border rounded"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    قبلی
-                </button>
-
-            </div>
         </div>
     );
 }

@@ -1,14 +1,41 @@
 @font-face {
-  font-family: 'yekanFont';
-  src: url('/src/assets/font/IRENYekan.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+    font-family: 'yekanFont';
+    src: url('/src/assets/font/IRENYekan.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* 1. Force WebKit browsers to render scrollbar *inside* */
+.scrollbar-inside {
+    /* hide the default overlay scrollbar */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 2. Thin scrollbar that lives inside the padding we reserved */
+.scrollbar-inside::-webkit-scrollbar {
+    width: 8px;
+    /* thin */
+}
+
+.scrollbar-inside::-webkit-scrollbar-track {
+    background: transparent;
+    /* no track background */
+}
+
+.scrollbar-inside::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.scrollbar-inside::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* 3. Firefox – thin scrollbar (already set via style={{scrollbarWidth:'thin'}}) */
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
