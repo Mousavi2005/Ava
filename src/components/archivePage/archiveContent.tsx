@@ -205,17 +205,6 @@ export default function ArchiveContent() {
             </table>
 
             <div className="w-full flex items-center justify-center gap-4 mt-4 text-sm">
-                <button
-                    className="px-3 py-1 border rounded"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    قبلی
-                </button>
-
-                <span>
-                    صفحه {table.getState().pagination.pageIndex + 1} از {table.getPageCount()}
-                </span>
 
                 <button
                     className="px-3 py-1 border rounded"
@@ -225,16 +214,19 @@ export default function ArchiveContent() {
                     بعدی
                 </button>
 
-                <select
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e) => table.setPageSize(Number(e.target.value))}
+                <span>
+                    صفحه {table.getState().pagination.pageIndex + 1} از {table.getPageCount()}
+                </span>
+
+
+                <button
+                    className="px-3 py-1 border rounded"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
                 >
-                    {[5, 8, 10, 20].map(size => (
-                        <option key={size} value={size}>
-                            {size} rows
-                        </option>
-                    ))}
-                </select>
+                    قبلی
+                </button>
+
             </div>
         </div>
     );

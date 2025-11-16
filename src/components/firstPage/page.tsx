@@ -9,7 +9,7 @@ export default function FirstPage() {
 
             <DropDown></DropDown>
 
-            <div className='w-full flex flex-col items-center'>
+            <div className='w-full flex flex-col items-center justify-around py-8'>
                 <HeaderText></HeaderText>
                 <Uploading></Uploading>
             </div>
