@@ -122,7 +122,6 @@ export default function ArchiveContent() {
     }
 
     function formatTime(t: string) {
-        // input: 0:00:0.510
         const parts = t.split(":");
         const minutes = parts[1];
         const seconds = parts[2]
@@ -159,7 +158,9 @@ export default function ArchiveContent() {
         load();
     }, []);
 
-    console.log(audios);
+
+
+    // console.log(audios);
 
 
     return (
