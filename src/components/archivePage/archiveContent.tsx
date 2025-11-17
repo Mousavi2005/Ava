@@ -2,9 +2,11 @@ import { useState, useEffect, useMemo } from "react";
 import { useReactTable, getCoreRowModel, getPaginationRowModel, flexRender, getExpandedRowModel } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import axios from "axios";
+import type { AxiosResponse } from 'axios'
 import React from "react";
-import Expanded from "../expanded";
+import ExpandedArchive from "../archiveExpanded";
 import Pagination from "../pagination";
+
 
 // icons
 import archiveUpload from "../../assets/icons/archive/rightIcons/archiveUploadIcon.svg";
@@ -36,6 +38,8 @@ export default function ArchiveContent() {
     const [hoverDownload, setHoverDownload] = useState(false);
     const [hoverCopy, setHoverCopy] = useState(false);
     const [hoverDelete, setHoverDelete] = useState(false);
+    const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+
     const columns: ColumnDef<Audio>[] = useMemo(() => [
         {
             id: "icon",
@@ -81,7 +85,7 @@ export default function ArchiveContent() {
                         <button
                             onMouseEnter={() => setHoverDelete(true)}
                             onMouseLeave={() => setHoverDelete(false)}
-                            onClick={() => console.log("Delete:", data.id)}
+                            onClick={() => deleteRequest(data.id)}
                             className={`${hoverDelete ? "bg-[rgba(220,53,69,1)]" : ""} w-[25px] h-[25px] rounded-full flex items-center justify-center`}
                         >
                             <img src={hoverDelete ? ActiveDeleteIcon : DeleteIcon} alt="" className="w-[9.5px] h-[14px]" />
@@ -138,6 +142,23 @@ export default function ArchiveContent() {
         } catch (error) { console.log(error); }
     }
 
+    async function deleteRequest(id: number): Promise<AxiosResponse<any> | undefined> {
+        const token = import.meta.env.VITE_API_TOKEN;
+        try {
+            const response = await axios.delete(`https://harf.roshan-ai.ir/api/requests/${id}/`, {
+                headers: {
+                    Authorization: token
+                }
+            });
+            return response;
+        } catch (error) {
+            console.log(error);
+            return undefined;
+        }
+
+        // after deleting a request, should refetch requests
+    }
+
     useEffect(() => {
         async function load() {
             const data = await listRequests();
@@ -159,67 +180,82 @@ export default function ArchiveContent() {
     }, []);
 
 
-
-    // console.log(audios);
-
-
     return (
         <div className="w-[1100px]">
-            <table className="w-full table-fixed" dir="rtl">
-                <colgroup>
+            <table className="w-full table-fixed border-collapse" dir="rtl">
+                {/* <colgroup>
                     <col className="w-[40px]" />
                     <col className="w-[40%]" />
                     <col className="w-[76px]" />
                     <col className="w-[50px]" />
                     <col className="w-[73px]" />
                     <col className="w-[107px]" />
-                </colgroup>
+                </colgroup> */}
 
                 <thead>
                     {table.getHeaderGroups().map(hg => (
-                        <tr key={hg.id} className="text-right">
-                            {hg.headers.map(header => (
-                                <th key={header.id} className="text-[14px] font-normal px-2">
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
-                                </th>
-                            ))}
+                        <tr key={hg.id}>
+                            <th colSpan={hg.headers.length} className="p-0">
+                                <div className="grid grid-cols-[40px_55%_90px_70px_80px_110px] text-right font-normal text-[14px]">
+                                    {hg.headers.map(header => (
+                                        <div key={header.id}>
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                        </div>
+                                    ))}
+                                </div>
+                            </th>
                         </tr>
                     ))}
                 </thead>
+
+
 
                 <tbody>
                     {table.getPaginationRowModel().rows.map(row => (
                         <React.Fragment key={row.id}>
                             <tr
-                                onClick={() => row.toggleExpanded()}
-                                className="cursor-pointer hover:bg-gray-50"
+                                onClick={() => {
+                                    setExpandedRowId(prev => (prev === row.id ? null : row.id));
+                                }}
+                                className="cursor-pointer hover:bg-gray-50 p-0"
                             >
-                                {row.getVisibleCells().map(cell => (
-                                    <td
-                                        key={cell.id}
-                                        dir={(cell.column.id === "audioType" || cell.column.id === "filename") ? "ltr" : "rtl"}
-                                        className={`px-2 font-light ${cell.column.id === "filename" ? "text-[16px] text-right" : "text-[12px]"}`}
-                                        style={{
-                                            width: cell.column.id === "icon" ? "32px" : undefined,
-                                            minWidth: cell.column.id === "icon" ? "32px" : undefined,
-                                            maxWidth: cell.column.id === "icon" ? "32px" : undefined,
-                                        }}
+                                <td colSpan={row.getVisibleCells().length} className="p-0">
+                                    <div
+                                        className={
+                                            row.id === expandedRowId
+                                                ? "border-[2px] border-red-300 border-b-0 rounded-t-[10px] mr-[1px] ml-[-1px]"
+                                                : ""
+                                        }
                                     >
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </td>
-                                ))}
+                                        <div className="grid grid-cols-[40px_55%_90px_70px_80px_110px]">
+                                            {row.getVisibleCells().map(cell => (
+                                                <div
+                                                    key={cell.id}
+                                                    className={`px-2 py-2 font-light ${cell.column.id === "filename"
+                                                        ? "text-[16px] text-right"
+                                                        : "text-[12px]"
+                                                        }`}
+                                                >
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
 
-                            {row.getIsExpanded() && (
+
+                            {expandedRowId === row.id && (
                                 <tr>
-                                    <td colSpan={row.getVisibleCells().length} className="bg-gray-50 p-2 text-sm">
-                                        <Expanded segments={row.original.segments} ></Expanded>
+                                    <td colSpan={row.getVisibleCells().length} className="bg-gray-50 text-sm pb-2">
+                                        <ExpandedArchive segments={row.original.segments} fileType={row.original.audioType} />
                                     </td>
                                 </tr>
                             )}
                         </React.Fragment>
                     ))}
                 </tbody>
+
             </table>
 
             <Pagination table={table}></Pagination>

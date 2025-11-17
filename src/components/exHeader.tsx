@@ -29,9 +29,9 @@ export default function ExpandedHeader() {
     }
 
     return (
-        <div className={`${activePage === 'archive' ? "w-[940px]" : "w-full"} flex items-center justify-between h-16 rounded-t-[25px] px-6`}>
+        <div className={`${activePage === 'archive' ? "w-[940px]" : "w-full"} flex items-center justify-between h-12 rounded-t-[25px] px-6`}>
 
-            <div className={`${activePage === 'transcribe' ? "flex" : "hidden"} items-center h-full gap-6`}>
+            <div className={`flex items-center h-full gap-6`}>
                 <button
                     onClick={restart}
                     className="w-[112px] h-[34px] rounded-[20px] bg-[rgba(17,138,211,1)] flex items-center justify-around">

@@ -2,15 +2,10 @@ import ExpandedHeader from "./exHeader";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from '../store/store'
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { setUploadedFile, setSimpleText } from "../slices/uploadFile";
 
 type Segment = { start: string; end: string; text: string };
-
-type ExpandedProps = {
-    segments: Segment[];
-};
-
 type AudioType = ".mp3" | ".mp4" | ".wav" | ".webm" | ".m4a" | null;
 type Audio = {
     icon?: string;
@@ -86,6 +81,7 @@ export default function Expanded() {
 
         } catch (error) {
             console.log(error);
+            return undefined
         }
     }
 
@@ -119,7 +115,7 @@ export default function Expanded() {
 
 
     return (
-        <div className={`${activePage === 'archive' ? "w-[1100px] max-h-[370px]" : "w-[653px] h-[429px]"}`}>
+        <div className={`${activePage === 'archive' ? "w-[1100px] max-h-[370px] border-[2px] border-t-0 mt-[-1px] border-red-400 pb-2 rounded-b-[10px]" : "w-[653px] h-[429px]"}`}>
             <ExpandedHeader />
 
             <div dir="rtl" className={`
@@ -127,6 +123,7 @@ export default function Expanded() {
                  pr-4 pl-2 ml-1 overflow-y-auto
                 `}>
 
+                {/* expand for file upload */}
                 {expandActiveSection === 'timed' ?
                     uploadedFile?.segments.map((s, idx) => (
                         <ul
@@ -148,6 +145,8 @@ export default function Expanded() {
                         {simpleText}
                     </p>
                 }
+
+
 
             </div>
         </div>
