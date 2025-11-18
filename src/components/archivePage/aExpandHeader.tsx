@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux"
-import type { RootState } from '../store/store'
+import type { RootState } from '../../store/store'
 
-import activeTextIcon from "../assets/icons/activeTextIcon.svg"
-import textIcon from "../assets/icons/textIcon.svg"
-import timeIcon from "../assets/icons/timeIcon.svg"
-import activeTimeIcon from "../assets/icons/activeTimeIcon.svg"
+import activeTextIcon from "../../assets/icons/activeTextIcon.svg"
+import textIcon from "../../assets/icons/textIcon.svg"
+import timeIcon from "../../assets/icons/timeIcon.svg"
+import activeTimeIcon from "../../assets/icons/activeTimeIcon.svg"
 
 type Props = {
     expandActiveSection: string;
@@ -16,7 +16,7 @@ export default function ArchiveExpandedHeader({ expandActiveSection, setExpandAc
     // const [expandActiveSection, setExpandActiveSection] = useState('simple')
 
     return (
-        <div className={`${activePage === 'archive' ? "w-[940px]" : "w-full"} flex items-center justify-between h-12 rounded-t-[25px] px-6`}>
+        <div className={` w-[900px] flex items-center justify-between h-12 rounded-t-[25px] px-6`}>
 
             <div className="flex h-full items-center gap-8" dir="rtl">
                 <button className="w-[81px] h-6 flex items-center gap-2"

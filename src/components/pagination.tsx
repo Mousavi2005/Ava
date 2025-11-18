@@ -47,7 +47,7 @@ function Pagination({ table }: PaginationProps) {
                         <button
                             key={i}
                             className={`w-8 h-8 flex items-center justify-center rounded-full
-                                ${p === page ? "bg-green-500 text-white" : ""}
+                                ${p === page ? "bg-[rgba(7,180,155,1)] text-white" : ""}
                             `}
                             onClick={() => table.setPageIndex(p - 1)}
                         >

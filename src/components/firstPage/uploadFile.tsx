@@ -1,15 +1,20 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../store/store";
-import { setUploadStatus, setFileType } from "../../../slices/uploadFile";
-import Expanded from "../../expanded";
-import UploadText from "../../texts/upload/uploadFile"
-import ActiveUploadIcon from '../../../assets/icons/active/activeUpload.svg'
+import type { RootState } from "../../store/store";
+import { setUploadStatus, setFileType } from "../../slices/uploadFile";
+import Expanded from "./expanded";
+import UploadText from "../text/transcribePage/uploadFile"
+import ActiveUploadIcon from '../../assets/icons/active/activeUpload.svg'
+import axios from "axios";
 
-export default function SectionTwo() {
+export default function UploadFile() {
+
     const dispatch = useDispatch()
     const fileInputRef = useRef<HTMLInputElement>(null)
     const isFileUploaded = useSelector((state: RootState) => state.uploadFile.uploadStatus)
+    // const uploadedFile = useSelector((state: RootState) => state.uploadFile.uploadedFile)
+    const [uploadedFile, setUploadedFile] = useState(null)
+    const [segments, setSegments] = useState(null)
     // const segments = [
     //     { start: "0:00:0.510", end: "0:00:3.540", text: "افتخاری بالاتر از تمدید قراردادم با پرسپولیس" },
     //     { start: "0:00:3.750", end: "0:00:7.350", text: "خرید طلا راحت تر از همیشه با ملی گرگ" },
@@ -24,27 +29,79 @@ export default function SectionTwo() {
     //     { start: "0:00:54.660", end: "0:00:59.370", text: "جوایز وقتی انگلیسی صحبت نمی کردند برای مسی در حکم مترجم" }
     // ];
 
+    async function transcribeFile(file: File) {
+        const token = import.meta.env.VITE_API_TOKEN;
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('media', file); // Key is 'media' based on Postman
 
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const getFileType = () => {
-            if (file.type === "audio/mpeg") return '.mp3'
-            if (file.type === "video/mp4") return '.mp4'
-            return null
+            const response = await axios.post(
+                "https://harf.roshan-ai.ir/api/transcribe_files/",
+                formData, // Send FormData instead of JSON
+                {
+                    headers: {
+                        Authorization: token,
+                        // Note: Don't set Content-Type for FormData, axios does it automatically
+                        // with the correct boundary for multipart/form-data
+                    }
+                }
+            );
+
+            console.log("SUCCESS:", response.status, response.data);
+            return response.data;
+
+        } catch (err: any) {
+            console.error("ERROR STATUS:", err.response?.status);
+            console.error("ERROR DATA:", err.response?.data);
+            throw err;
         }
-        dispatch(setFileType(getFileType()))
-        dispatch(setUploadStatus('uploaded'))
+    }
 
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        console.log(`uploaded file : ${file}`);
+
+        if (!file) return;
+
+        try {
+            // Set loading state
+            dispatch(setUploadStatus('uploading'));
+
+            // Determine file type
+            const getFileType = () => {
+                if (file.type === "audio/mpeg") return '.mp3';
+                if (file.type === "video/mp4") return '.mp4';
+                return null;
+            };
+
+            const fileType = getFileType();
+            dispatch(setFileType(fileType));
+
+            const transcriptionResult = await transcribeFile(file);
+            console.log('Transcription completed:', transcriptionResult);
+            dispatch(setUploadStatus('uploaded'));
+
+            setUploadedFile(transcriptionResult[0])
+            setSegments(transcriptionResult[0].segments)
+            // You might want to store the transcription data in your state
+            // dispatch(setTranscriptionData(transcriptionResult));
+
+        } catch (error) {
+            console.error('File upload/transcription failed:', error);
+        }
     };
+
+    console.log(`segments : ${segments}`);
+
 
 
 
     return (
         <>
             {isFileUploaded === 'uploaded' ?
-                <Expanded></Expanded>
+                <Expanded segments={segments}></Expanded>
                 :
                 <div className="w-full h-full flex flex-col items-center justify-center gap-2">
                     <button

@@ -1,8 +1,8 @@
 import { useState } from "react"
-import userIcon from "../../assets/icons/user.svg"
-import dropIcon from "../../assets/icons/dropIcon.svg"
-import dropIcon2 from "../../assets/icons/dropIcon2.svg"
-import logout from "../../assets/icons/logout.svg"
+import userIcon from "../assets/icons/user.svg"
+import dropIcon from "../assets/icons/dropIcon.svg"
+import dropIcon2 from "../assets/icons/dropIcon2.svg"
+import logout from "../assets/icons/logout.svg"
 
 function DropDown() {
 

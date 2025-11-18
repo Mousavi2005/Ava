@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 type Upload = 'uploaded' | 'isUploading' | null
-
 type File = '.mp3' | '.mp4' | null
 type Segment = { start: string; end: string; text: string };
 type AudioType = ".mp3" | ".mp4" | ".wav" | ".webm" | ".m4a" | null;

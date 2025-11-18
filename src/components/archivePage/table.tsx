@@ -2,9 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { useReactTable, getCoreRowModel, getPaginationRowModel, flexRender, getExpandedRowModel } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import axios from "axios";
-import type { AxiosResponse } from 'axios'
 import React from "react";
-import ExpandedArchive from "../archiveExpanded";
+import ExpandedArchive from "./aExpanded";
 import Pagination from "../pagination";
 
 
@@ -33,11 +32,12 @@ type Audio = {
     audioType: AudioType;
 };
 
-export default function ArchiveContent() {
+export default function Table() {
     const [audios, setAudios] = useState<Audio[]>([]);
-    const [hoverDownload, setHoverDownload] = useState(false);
-    const [hoverCopy, setHoverCopy] = useState(false);
-    const [hoverDelete, setHoverDelete] = useState(false);
+
+    const [hoverDownloadId, setHoverDownloadId] = useState<number | null>(null);
+    const [hoverCopyId, setHoverCopyId] = useState<number | null>(null);
+    const [hoverDeleteId, setHoverDeleteId] = useState<number | null>(null);
     const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
     const columns: ColumnDef<Audio>[] = useMemo(() => [
@@ -63,11 +63,11 @@ export default function ArchiveContent() {
                 return (
                     <div className="flex gap-3">
                         <button
-                            onMouseEnter={() => setHoverDownload(true)}
-                            onMouseLeave={() => setHoverDownload(false)}
+                            onMouseEnter={() => setHoverDownloadId(data.id)}
+                            onMouseLeave={() => setHoverDownloadId(null)}
                             onClick={() => console.log("Play:", data)}
                         >
-                            <img src={hoverDownload ? ActiveDownloadIcon : DownloadIcon} alt="" className="w-[13.4px] h-[14.15px]" />
+                            <img src={hoverDownloadId === data.id ? ActiveDownloadIcon : DownloadIcon} alt="" className="w-[13.4px] h-[14.15px]" />
                         </button>
 
                         <button onClick={() => console.log("Play:", data)}>
@@ -75,26 +75,29 @@ export default function ArchiveContent() {
                         </button>
 
                         <button
-                            onMouseEnter={() => setHoverCopy(true)}
-                            onMouseLeave={() => setHoverCopy(false)}
+                            onMouseEnter={() => setHoverCopyId(data.id)}
+                            onMouseLeave={() => setHoverCopyId(null)}
                             onClick={() => console.log("Play:", data)}
                         >
-                            <img src={hoverCopy ? ActiveCopyIcon : CopyIcon} alt="" className="w-[15.8px] h-[17.2px]" />
+                            <img src={hoverCopyId === data.id ? ActiveCopyIcon : CopyIcon} alt="" className="w-[15.8px] h-[17.2px]" />
                         </button>
 
                         <button
-                            onMouseEnter={() => setHoverDelete(true)}
-                            onMouseLeave={() => setHoverDelete(false)}
-                            onClick={() => deleteRequest(data.id)}
-                            className={`${hoverDelete ? "bg-[rgba(220,53,69,1)]" : ""} w-[25px] h-[25px] rounded-full flex items-center justify-center`}
+                            onMouseEnter={() => setHoverDeleteId(data.id)}
+                            onMouseLeave={() => setHoverDeleteId(null)}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                deleteRequest(data.id)
+                            }}
+                            className={`${hoverDeleteId === data.id ? "bg-[rgba(220,53,69,1)]" : ""} w-[25px] h-[25px] rounded-full flex items-center justify-center`}
                         >
-                            <img src={hoverDelete ? ActiveDeleteIcon : DeleteIcon} alt="" className="w-[9.5px] h-[14px]" />
+                            <img src={hoverDeleteId === data.id ? ActiveDeleteIcon : DeleteIcon} alt="" className="w-[9.5px] h-[14px]" />
                         </button>
                     </div>
                 );
             },
         },
-    ], [hoverDownload, hoverCopy, hoverDelete]);
+    ], [hoverDownloadId, hoverCopyId, hoverDeleteId]);
 
     const table = useReactTable<Audio>({
         data: audios,
@@ -142,22 +145,24 @@ export default function ArchiveContent() {
         } catch (error) { console.log(error); }
     }
 
-    async function deleteRequest(id: number): Promise<AxiosResponse<any> | undefined> {
+    async function deleteRequest(id: number) {
+        console.log(id);
+
         const token = import.meta.env.VITE_API_TOKEN;
         try {
-            const response = await axios.delete(`https://harf.roshan-ai.ir/api/requests/${id}/`, {
+            await axios.delete(`https://harf.roshan-ai.ir/api/requests/${id}/`, {
                 headers: {
                     Authorization: token
                 }
             });
-            return response;
+            setAudios(prev => prev.filter(item => item.id !== id));
         } catch (error) {
             console.log(error);
-            return undefined;
+            // return undefined;
         }
 
-        // after deleting a request, should refetch requests
     }
+
 
     useEffect(() => {
         async function load() {
@@ -177,13 +182,28 @@ export default function ArchiveContent() {
             }
         }
         load();
+
     }, []);
 
+    console.log(audios);
+
+
+    function extractBorderColor(fileType: string | null) {
+        if (fileType === '.wav') {
+            return ('rgba(255,22,84,1)')
+        }
+        else if (fileType === '.mp4' || fileType === '.webm' || fileType === '.m4a') {
+            return ('rgba(17,138,211,1)')
+        }
+        return ('rgba(0,186,159,1)')
+
+    }
 
     return (
-        <div className="w-[1100px]">
-            <table className="w-full table-fixed border-collapse" dir="rtl">
-                {/* <colgroup>
+        <div className="w-[1100px] h-[450px]">
+            <div className="max-h-[450px] w-[1100px] overflow-y-auto">
+                <table className="w-full table-fixed border-collapse max-h-[450px] overflow-y-auto flex flex-col items-center" dir="rtl">
+                    {/* <colgroup>
                     <col className="w-[40px]" />
                     <col className="w-[40%]" />
                     <col className="w-[76px]" />
@@ -192,71 +212,70 @@ export default function ArchiveContent() {
                     <col className="w-[107px]" />
                 </colgroup> */}
 
-                <thead>
-                    {table.getHeaderGroups().map(hg => (
-                        <tr key={hg.id}>
-                            <th colSpan={hg.headers.length} className="p-0">
-                                <div className="grid grid-cols-[40px_55%_90px_70px_80px_110px] text-right font-normal text-[14px]">
-                                    {hg.headers.map(header => (
-                                        <div key={header.id}>
-                                            {flexRender(header.column.columnDef.header, header.getContext())}
-                                        </div>
-                                    ))}
-                                </div>
-                            </th>
-                        </tr>
-                    ))}
-                </thead>
-
-
-
-                <tbody>
-                    {table.getPaginationRowModel().rows.map(row => (
-                        <React.Fragment key={row.id}>
-                            <tr
-                                onClick={() => {
-                                    setExpandedRowId(prev => (prev === row.id ? null : row.id));
-                                }}
-                                className="cursor-pointer hover:bg-gray-50 p-0"
-                            >
-                                <td colSpan={row.getVisibleCells().length} className="p-0">
-                                    <div
-                                        className={
-                                            row.id === expandedRowId
-                                                ? "border-[2px] border-red-300 border-b-0 rounded-t-[10px] mr-[1px] ml-[-1px]"
-                                                : ""
-                                        }
-                                    >
-                                        <div className="grid grid-cols-[40px_55%_90px_70px_80px_110px]">
-                                            {row.getVisibleCells().map(cell => (
-                                                <div
-                                                    key={cell.id}
-                                                    className={`px-2 py-2 font-light ${cell.column.id === "filename"
-                                                        ? "text-[16px] text-right"
-                                                        : "text-[12px]"
-                                                        }`}
-                                                >
-                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                </div>
-                                            ))}
-                                        </div>
+                    <thead>
+                        {table.getHeaderGroups().map(hg => (
+                            <tr key={hg.id}>
+                                <th colSpan={hg.headers.length} className="p-0">
+                                    <div className="w-[900px] h-[40px] grid grid-cols-[40px_55%_90px_70px_80px_110px] text-right font-normal text-[14px]">
+                                        {hg.headers.map(header => (
+                                            <div key={header.id}>
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                            </div>
+                                        ))}
                                     </div>
-                                </td>
+                                </th>
                             </tr>
+                        ))}
+                    </thead>
 
-
-                            {expandedRowId === row.id && (
-                                <tr>
-                                    <td colSpan={row.getVisibleCells().length} className="bg-gray-50 text-sm pb-2">
-                                        <ExpandedArchive segments={row.original.segments} fileType={row.original.audioType} />
+                    <tbody>
+                        {table.getPaginationRowModel().rows.map(row => (
+                            <React.Fragment key={row.id}>
+                                <tr
+                                    onClick={() => {
+                                        setExpandedRowId(prev => (prev === row.id ? null : row.id));
+                                    }}
+                                    className="cursor-pointer"
+                                >
+                                    <td colSpan={row.getVisibleCells().length} className="p-0">
+                                        <div
+                                            className={
+                                                row.id === expandedRowId
+                                                    ? `w-[900px] h-[50px] border-[2px] border-[${extractBorderColor(row.original.audioType)}] border-b-0 rounded-t-[10px] mr-[1px] ml-[-1px]`
+                                                    : "w-[900px] h-[50px]"
+                                            }
+                                        >
+                                            <div className="grid grid-cols-[40px_55%_90px_70px_80px_110px]">
+                                                {row.getVisibleCells().map(cell => (
+                                                    <div
+                                                        key={cell.id}
+                                                        className={`font-light flex items-center ${cell.column.id === "filename"
+                                                            ? "text-[16px] text-right"
+                                                            : "text-[12px]"
+                                                            }`}
+                                                    >
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </tbody>
 
-            </table>
+
+                                {expandedRowId === row.id && (
+                                    <tr>
+                                        <td colSpan={row.getVisibleCells().length} className=" text-sm pb-2">
+                                            <ExpandedArchive segments={row.original.segments} fileType={row.original.audioType} />
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
 
             <Pagination table={table}></Pagination>
 

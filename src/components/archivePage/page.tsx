@@ -1,21 +1,25 @@
-import DropDown from "../dropdown/dropdown";
-import Sidebar from "../sidebar/sidebar";
-import ArchiveContent from "./archiveContent";
-import ArchiveHeaderText from "./ArchiveHeaderText";
+import DropDown from "../dropdown";
+import Sidebar from "../sidebar";
+import Table from "./table";
+import Description from "../text/archivePage/description";
 
 export default function ArchivePage() {
 
     return (
         <>
             <DropDown></DropDown>
-            <div className='w-full flex flex-col items-center justify-center'>
-                <div className="flex flex-col items-end gap-5">
-                    <ArchiveHeaderText></ArchiveHeaderText>
-                    <ArchiveContent></ArchiveContent>
-                </div>
 
+            <div className="w-screen h-screen flex">
+                <div className='w-full h-full flex flex-col items-center justify-center'>
+                    <div className="w-[1100px] h-[540px] flex flex-col justify-between">
+                        <Description></Description>
+                        <Table></Table>
+                    </div>
+
+                </div>
+                <Sidebar></Sidebar>
             </div>
-            <Sidebar></Sidebar>
+
         </>
     )
 }

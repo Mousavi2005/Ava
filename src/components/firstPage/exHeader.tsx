@@ -1,18 +1,18 @@
 import { useDispatch, useSelector } from "react-redux"
-import { setActiveSection } from "../slices/expanded"
-import { setUploadStatus, setFileType, setUploadedFile } from "../slices/uploadFile"
-import type { RootState } from '../store/store'
+import { setActiveSection } from "../../slices/expanded"
+import { setUploadStatus, setFileType, setUploadedFile } from "../../slices/uploadFile"
+import type { RootState } from '../../store/store'
 import { useState } from "react"
 
-import activeTextIcon from "../assets/icons/activeTextIcon.svg"
-import textIcon from "../assets/icons/textIcon.svg"
-import timeIcon from "../assets/icons/timeIcon.svg"
-import activeTimeIcon from "../assets/icons/activeTimeIcon.svg"
-import refreshIcon from '../assets/icons/refreshIcon.svg'
-import downloadIcon from '../assets/icons/archive/downloadIcon.svg'
-import activeDownloadIcon from '../assets/icons/archive/activeDownload.svg'
-import copyIcon from '../assets/icons/archive/copyIcon.svg'
-import activeCopyIcon from '../assets/icons/archive/activeCopy.svg'
+import activeTextIcon from "../../assets/icons/activeTextIcon.svg"
+import textIcon from "../../assets/icons/textIcon.svg"
+import timeIcon from "../../assets/icons/timeIcon.svg"
+import activeTimeIcon from "../../assets/icons/activeTimeIcon.svg"
+import refreshIcon from '../../assets/icons/refreshIcon.svg'
+import downloadIcon from '../../assets/icons/archive/downloadIcon.svg'
+import activeDownloadIcon from '../../assets/icons/archive/activeDownload.svg'
+import copyIcon from '../../assets/icons/archive/copyIcon.svg'
+import activeCopyIcon from '../../assets/icons/archive/activeCopy.svg'
 
 export default function ExpandedHeader() {
     const dispatch = useDispatch()
