@@ -1,18 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 type Upload = 'uploaded' | 'isUploading' | null
+type Url = string
 
 const initialState = {
     uploadStatus: null as Upload,
+    url: "" as Url
 }
 
 const uploadLinkSlice = createSlice({
     name: 'uploadLink',
     initialState,
     reducers: {
-        setUploadStatus: (state, action) => { state.uploadStatus = action.payload },
+        setLinkStatus: (state, action) => { state.uploadStatus = action.payload },
+        setUrl: (state, action) => { state.url = action.payload }
     }
 })
 
-export const { setUploadStatus } = uploadLinkSlice.actions
+export const { setLinkStatus, setUrl } = uploadLinkSlice.actions
 export default uploadLinkSlice.reducer

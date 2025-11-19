@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useReactTable, getCoreRowModel, getPaginationRowModel, flexRender, getExpandedRowModel } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import axios from "axios";
 import React from "react";
 import ExpandedArchive from "./aExpanded";
 import Pagination from "../pagination";
-
+import { listRequestsSocket, deleteRequestSocket } from "../../api/harfApi";
 
 // icons
 import archiveUpload from "../../assets/icons/archive/rightIcons/archiveUploadIcon.svg";
@@ -63,21 +62,31 @@ export default function Table() {
                 return (
                     <div className="flex gap-3">
                         <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                            }}
                             onMouseEnter={() => setHoverDownloadId(data.id)}
                             onMouseLeave={() => setHoverDownloadId(null)}
-                            onClick={() => console.log("Play:", data)}
                         >
                             <img src={hoverDownloadId === data.id ? ActiveDownloadIcon : DownloadIcon} alt="" className="w-[13.4px] h-[14.15px]" />
                         </button>
 
-                        <button onClick={() => console.log("Play:", data)}>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                            }}
+                        >
                             <img src={WordIcon} alt="" className="w-[13px] h-[16.2px]" />
                         </button>
 
                         <button
                             onMouseEnter={() => setHoverCopyId(data.id)}
                             onMouseLeave={() => setHoverCopyId(null)}
-                            onClick={() => console.log("Play:", data)}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                const text = data.segments.map(s => s.text).join("");
+                                navigator.clipboard.writeText(text);
+                            }}
                         >
                             <img src={hoverCopyId === data.id ? ActiveCopyIcon : CopyIcon} alt="" className="w-[15.8px] h-[17.2px]" />
                         </button>
@@ -135,38 +144,88 @@ export default function Table() {
         return `${minutes}:${seconds}`;
     }
 
+    // async function listRequests() {
+    //     const token = import.meta.env.VITE_API_TOKEN;
+    //     try {
+    //         const response = await axios.get("https://harf.roshan-ai.ir/api/requests/", {
+    //             headers: { Authorization: token },
+    //         });
+    //         return response.data as Audio[];
+    //     } catch (error) { console.log(error); }
+    // }
+
+    // let a =''
+    // async function deleteRequest(id: number) {
+    //     console.log(id);
+
+    //     const token = import.meta.env.VITE_API_TOKEN;
+    //     try {
+    //         await axios.delete(`https://harf.roshan-ai.ir/api/requests/${id}/`, {
+    //             headers: {
+    //                 Authorization: token
+    //             }
+    //         });
+    //         setAudios(prev => prev.filter(item => item.id !== id));
+    //     } catch (error) {
+    //         console.log(error);
+    //         // return undefined;
+    //     }
+
+    // }
+
+
+    // useEffect(() => {
+    //     async function load() {
+    //         const data = await listRequests();
+    //         if (data) {
+    //             const updated = data.map(d => ({
+    //                 ...d,
+    //                 audioType: getAudioType(d.filename),
+    //                 processed: isoToJalali(d.processed),
+    //                 segments: d.segments?.map(s => ({
+    //                     ...s,
+    //                     start: formatTime(s.start),
+    //                     end: formatTime(s.end)
+    //                 }))
+    //             }));
+    //             setAudios(updated);
+    //         }
+    //     }
+    //     load();
+
+    // }, []);
+
+    // console.log(audios);
+
+
+
     async function listRequests() {
-        const token = import.meta.env.VITE_API_TOKEN;
-        try {
-            const response = await axios.get("https://harf.roshan-ai.ir/api/requests/", {
-                headers: { Authorization: token },
-            });
-            return response.data as Audio[];
-        } catch (error) { console.log(error); }
+        const res = await listRequestsSocket();
+
+        if (!res.ok) {
+            console.log("socket error:", res.error);
+            return undefined;
+        }
+
+        return res.data as Audio[];
     }
 
     async function deleteRequest(id: number) {
-        console.log(id);
+        const res = await deleteRequestSocket(id);
 
-        const token = import.meta.env.VITE_API_TOKEN;
-        try {
-            await axios.delete(`https://harf.roshan-ai.ir/api/requests/${id}/`, {
-                headers: {
-                    Authorization: token
-                }
-            });
-            setAudios(prev => prev.filter(item => item.id !== id));
-        } catch (error) {
-            console.log(error);
-            // return undefined;
+        if (!res.ok) {
+            console.log("socket error:", res.error);
+            return;
         }
 
+        // same behavior you had before
+        setAudios(prev => prev.filter(item => item.id !== id));
     }
-
 
     useEffect(() => {
         async function load() {
             const data = await listRequests();
+
             if (data) {
                 const updated = data.map(d => ({
                     ...d,
@@ -178,14 +237,15 @@ export default function Table() {
                         end: formatTime(s.end)
                     }))
                 }));
+
                 setAudios(updated);
             }
         }
+
         load();
 
     }, []);
 
-    console.log(audios);
 
 
     function extractBorderColor(fileType: string | null) {

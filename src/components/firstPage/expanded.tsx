@@ -1,10 +1,11 @@
-import ExpandedHeader from "./exHeader";
+// import ExpandedHeader from "./exHeader";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from '../../store/store'
 // import axios from "axios";
 import { useEffect, useState } from "react";
 import { setSimpleText } from "../../slices/uploadFile";
 import { setFileType, setUploadedFile, setUploadStatus } from "../../slices/uploadFile"
+import { setLinkStatus, setUrl } from "../../slices/uploadLink";
 
 import activeTextIcon from "../../assets/icons/activeTextIcon.svg"
 import textIcon from "../../assets/icons/textIcon.svg"
@@ -15,6 +16,7 @@ import copyIcon from '../../assets/icons/archive/copyIcon.svg'
 import activeCopyIcon from '../../assets/icons/archive/activeCopy.svg'
 import downloadIcon from '../../assets/icons/archive/downloadIcon.svg'
 import activeDownloadIcon from '../../assets/icons/archive/activeDownload.svg'
+// import { setLinkStatus } from "../../slices/uploadLink";
 
 type Segment = { start: string; end: string; text: string };
 type AudioType = ".mp3" | ".mp4" | ".wav" | ".webm" | ".m4a" | null;
@@ -35,6 +37,7 @@ export default function Expanded({ segments }: any) {
     const uploadedFile = useSelector((state: RootState) => state.uploadFile.uploadedFile)
     const simpleText = useSelector((state: RootState) => state.uploadFile.simpleText)
     const activePage = useSelector((state: RootState) => (state.page.activePage))
+    const activeToggleSection = useSelector((state: RootState) => state.toggle.active)
     // const uploadStatus = useSelector((state: RootState) => state.uploadFile.uploadStatus)
     // const expandActiveSection = useSelector((state: RootState) => state.expand.activeSection)
     const [expandActiveSection, setExpandedActiveSection] = useState('simple')
@@ -124,14 +127,23 @@ export default function Expanded({ segments }: any) {
 
     // }, [uploadStatus]);
 
-    console.log(`segmets : ${segments}`);
-    console.log(`simple text : ${simpleText}`);
+    // console.log(`segmets : ${segments}`);
+    // console.log(`simple text : ${simpleText}`);
+
 
     function restart() {
-        setExpandedActiveSection('simple')
-        dispatch(setFileType(null))
-        dispatch(setUploadedFile(null))
-        dispatch(setUploadStatus(null))
+        if (activeToggleSection === 'upload') {
+            setExpandedActiveSection('simple')
+            dispatch(setFileType(null))
+            dispatch(setUploadedFile(null))
+            dispatch(setUploadStatus(null))
+        }
+        if (activeToggleSection === 'link') {
+            setExpandedActiveSection('simple')
+            dispatch(setLinkStatus(null))
+            dispatch(setUrl(''))
+        }
+
     }
 
     return (
@@ -148,13 +160,19 @@ export default function Expanded({ segments }: any) {
                         <span className="text-[14px] font-normal text-[rgba(255,255,255,1)]">شروع دوباره</span>
                         <img src={refreshIcon} alt="" className="w-3 h-3" />
                     </button>
+
                     <button
+                        onClick={() => {
+                            console.log('copied');
+                            navigator.clipboard.writeText(simpleText)
+                        }}
                         onMouseEnter={() => setHoverCopy(true)}
                         onMouseLeave={() => setHoverCopy(false)}
 
                     >
                         <img src={hoverCopy ? activeCopyIcon : copyIcon} alt="" className="w-[15.8px] h-[17.2px]" />
                     </button>
+
                     <button
                         onMouseEnter={() => setHoverDownload(true)}
                         onMouseLeave={() => setHoverDownload(false)}

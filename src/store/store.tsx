@@ -13,7 +13,7 @@ export const store = configureStore({
         expand: expandReducer,
         recordAudio: recordAudioReducer,
         uploadFile: uploadFileReducer,
-        uploadLink: uploadFileReducer
+        uploadLink: uploadLinkReducer
     }
 })
 
